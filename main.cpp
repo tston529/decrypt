@@ -11,6 +11,9 @@ using namespace std;
 //  time the project progresses enough to narrow down options to potential
 //  solutions to the overall problem (a successful or near-successful decryption)
 void print_to_file(ofstream&, const unordered_map<string, Word>&, const unordered_map <Word, string>&, unordered_map<string, int>&);
+void print(const unordered_map<string, Word>&, const unordered_map <Word, string>&, unordered_map<string, int>&);
+
+void decrypt(string, const unordered_map<string, Word>&, const unordered_map<Word, string>&, unordered_map<string, int>&);
 
 unordered_map<char, char> delta;
   char alph[]={'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 
@@ -36,11 +39,18 @@ int main()
   delta.insert({' ',' '});
 
   //The files to be read: the dictionary, and the encoded message
-  string dict_name = "enable1.txt";
-  string cipher = "cipher.dat";
+  string dict_name;
+  cout << "Enter the name of the dictionary: " << endl;
+  cin >> dict_name;
+  string cipher;
+  cout << "Enter the name of the encoded file: " << endl;
+  cin >> cipher;
 
-  unordered_map<string, Word> ciph_map; // map of ciphered words
-  unordered_map<Word, string> dict_map; // map of valid english words from dictionary
+  unordered_map<string, Word> ciph_map; // map of ciphered words; 
+                                        //          matches a string to a Word
+  unordered_map<Word, string> dict_map; // map of valid english words from dictionary;
+                                        //          matches a Word to a string
+
   unordered_map<string, int> count_map; // map to keep track of results (amount of matches per ciphered word)
 
 
@@ -74,8 +84,20 @@ int main()
     ciph_map.insert(ciph);
     count_map[encoded_word] = 0;
   }
+  c_file.close();
 
-  print_to_file(output, ciph_map, dict_map, count_map);
+  print(ciph_map, dict_map, count_map);
+  decrypt(cipher, ciph_map, dict_map, count_map);
+
+  ifstream ciph;
+  ciph.open(cipher.c_str());
+  ciph >> std::noskipws;
+  char toPrint;
+  while(ciph>>toPrint){
+      cout << delta[toPrint];
+  }
+  cout << endl;
+  ciph.close();
 
   return 0;
 }
@@ -104,4 +126,55 @@ void print_to_file(ofstream &output, const unordered_map<string, Word> &ciph_map
   }
   
   output.close();
+}
+
+void print(const unordered_map<string, Word> &ciph_map, const unordered_map<Word, string> &dict_map, unordered_map<string, int> &count_map){
+
+  for ( auto x = ciph_map.begin(); x != ciph_map.end(); ++x ){// x = pair(encoded word, word obj)
+
+    for( auto y = dict_map.begin(); y != dict_map.end(); ++y){// y = pair(word obj, dictionary word)
+        if((y->first.get_pattern()) == (x->second.get_pattern()) ){
+
+            count_map[x->first] = count_map[x->first]+1;
+        }
+
+    }
+  }
+  
+  for( auto z = count_map.begin(); z != count_map.end(); ++z){
+      cout << z->first << " : " << z->second << endl;
+  }
+  cout << endl;
+  
+}
+
+/*
+ciph_map->first  ==> ciphered string
+ciph_map->second ==> ciphered Word object
+
+dict_map->first  ==> dictionary Word object
+dict_map->second ==> dictionary string
+
+count_map->first ==> ciphered string
+count_map->second => amount of results
+*/
+
+void decrypt(string cipher, const unordered_map<string, Word> &ciph_map, const unordered_map<Word, string> &dict_map, unordered_map<string, int> &count_map){
+    //int lowMatches=1;
+    for ( auto x = ciph_map.begin(); x != ciph_map.end(); ++x ){
+        if(count_map[x->first]==1){//initially check for a single match
+
+            for( auto y = dict_map.begin(); y != dict_map.end(); ++y){// y = pair(word obj, dictionary word)
+                if((y->first.get_pattern()) == (x->second.get_pattern()) ){//found the match again
+                    int len = x->first.length();
+                    for(int i = 0; i < len; i++){
+                        delta[x->first[i]]=y->second[i];
+                    }
+                }//end if
+
+            }//end for (dict_map)
+            
+        }
+
+    }//end for (ciph_map)
 }

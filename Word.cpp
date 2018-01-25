@@ -13,10 +13,24 @@ Word::Word(std::string word){
   set_word(word);
 }
 
+
 void Word::set_word(std::string word){
 
   if(word.at(word.length()-1)==',')
     word.pop_back();
+
+    
+    //Make decoding other languages a tad easier by
+    //  replacing characters with accents with a more
+    //  familiar english equivalent
+    for(unsigned int i = 0; i < word.length(); i++){
+      const char*
+            //   "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ"
+            tr = "AAAAAAECEEEEIIIIDNOOOOOx0UUUUYPsaaaaaaeceeeeiiiiOnooooo/0uuuuypy";
+      if ( word.at(i) >=192 ) {
+        (word[i]) = tr[ word[i]-192 ];
+      }
+  }
   //Set the word
   word_str = word;
 
@@ -53,3 +67,21 @@ void Word::set_word(std::string word){
    stats.second = freq_map.size();
 
  }
+
+
+
+char* removeAccented( char* str ) {
+    char *p = str;
+    while ( (*p)!=0 ) {
+        const char*
+        //   "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ"
+        tr = "AAAAAAECEEEEIIIIDNOOOOOx0UUUUYPsaaaaaaeceeeeiiiiOnooooo/0uuuuypy";
+        unsigned char ch = (*p);
+        if ( ch >=192 ) {
+            (*p) = tr[ ch-192 ];
+        }
+        ++p; // http://stackoverflow.com/questions/14094621/
+    }
+    return str;
+}
+
