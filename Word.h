@@ -35,20 +35,15 @@ public:
 
 };
 
-//The hash.
+//The hash. Simple enough to get the overloaded == operator to work.
 // "That'll do, pig, that'll do."
 namespace std{
   template<>
     struct hash<Word> {
-     std::size_t operator()(const Word& k) const
-     {
-      using std::size_t;
-      using std::hash;
-      using std::string;
-
-         return ((std::hash<std::string>()(k.word_str)
+        std::size_t operator()(const Word& k) const{
+            return ((std::hash<std::string>()(k.word_str)
                    ^ (std::hash<int>()(k.stats.first) << 1)) >> 1) //length
                    ^ (std::hash<int>()(k.stats.second) << 1); //unique letters
-     }
+        }
     };
 }

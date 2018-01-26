@@ -67,21 +67,3 @@ void Word::set_word(std::string word){
    stats.second = freq_map.size();
 
  }
-
-
-
-char* removeAccented( char* str ) {
-    char *p = str;
-    while ( (*p)!=0 ) {
-        const char*
-        //   "ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþÿ"
-        tr = "AAAAAAECEEEEIIIIDNOOOOOx0UUUUYPsaaaaaaeceeeeiiiiOnooooo/0uuuuypy";
-        unsigned char ch = (*p);
-        if ( ch >=192 ) {
-            (*p) = tr[ ch-192 ];
-        }
-        ++p; // http://stackoverflow.com/questions/14094621/
-    }
-    return str;
-}
-
